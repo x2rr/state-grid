@@ -1550,6 +1550,8 @@ async function getMonthElecQuantity(e) {
   const o = bindInfo.powerUserList[e],
     [r] = bizrt.userInfo;
   try {
+    let queryYear = new Date().getFullYear().toString();
+    // let queryYear = '2024';
     let e = {
       url: `/api${$api.busInfoApi}`,
       method: 'post',
@@ -1576,7 +1578,7 @@ async function getMonthElecQuantity(e) {
             orgNo: o.orgNo,
             proCode: o.proNo || o.provinceId,
             provinceCode: o.proNo || o.provinceId,
-            queryYear: new Date().getFullYear().toString(),
+            queryYear: queryYear,
             serialNo: '',
             srvCode: '',
             userName: r.nickname ? r.nickname : r.loginAccount,
@@ -1594,6 +1596,13 @@ async function getMonthElecQuantity(e) {
       },
     };
     const s = await request(e);
+    if (!s.mothEleList || s.mothEleList.length < 12) {
+      queryYear = (new Date().getFullYear() - 1).toString();
+      e.data.params3.data.queryYear = queryYear;
+      const prevYearData = await request(e);
+      let arr = s.mothEleList || []
+      s.mothEleList = prevYearData.mothEleList.concat(arr);
+    }
     log.info('✅ 获取月用电量成功'),
       log.debug(jsonStr(s, null, 2)),
       (Global.monthElecQuantity = s);
@@ -1645,7 +1654,7 @@ async function sendMsg(e, eleBill, dayList, monthElecQuantity) {
   const client = mqtt.connect(connectUrl, {
     clientId,
     clean: true,
-    connectTimeout: 4000,
+    connectTimeout: 2000,
     username: mqtt_username,
     password: mqtt_password,
     reconnectPeriod: 1000,
@@ -1669,26 +1678,26 @@ async function sendMsg(e, eleBill, dayList, monthElecQuantity) {
 
   data.dayList = dayList;
   data.monthList = monthList;
-  data.totalEleNum = monthElecQuantity?.dataInfo?.totalEleNum || '';
-  data.totalEleCost = monthElecQuantity?.dataInfo?.totalEleCost || '';
+  data.totalEleNum = monthElecQuantity?.dataInfo?.totalEleNum || 0;
+  data.totalEleCost = monthElecQuantity?.dataInfo?.totalEleCost || 0;
   client.on('connect', () => {
-    console.log('Connected')
+    console.log('mqtt:Connected')
     //   console.log(data)
     client.publish(topic, JSON.stringify(data), { qos: 0, retain: false }, (error) => {
       if (error) {
         console.error(error)
-      }else {
-        console.log('Published')
+      } else {
+        console.log('mqtt:Published')
       }
     })
   })
 
   setTimeout(() => {
     client.end()
-  }, 5000)
+  }, 2000)
 
   await new Promise((resolve, reject) => {
-    setTimeout(() => resolve("done!"), 5000)
+    setTimeout(() => resolve("done!"), 2000)
   });
 }
 // async function sendMsg(e, o, r, s) {
@@ -1759,9 +1768,9 @@ async function sendMsg(e, eleBill, dayList, monthElecQuantity) {
       s.forEach((e, o) => {
         Number(e.dayElePq) && (a += `\n${e.day}用电: ${e.dayElePq}度⚡`);
       }),
-      console.log(monthElecQuantity)
-    // await sendMsg(SCRIPTNAME, '', a);
-    await sendMsg(SCRIPTNAME, eleBill, s, monthElecQuantity);
+      // console.log(monthElecQuantity)
+      // await sendMsg(SCRIPTNAME, '', a);
+      await sendMsg(SCRIPTNAME, eleBill, s, monthElecQuantity);
   }
 })()
   .catch(e => {
