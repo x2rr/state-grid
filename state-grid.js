@@ -1635,8 +1635,8 @@ async function sendMsg(e, eleBill, dayList, monthElecQuantity) {
     (isNode() ? process.env.WSGW_mqtt_host : store.get('95598_mqtt_host')) || '',
     port =
       (isNode() ? process.env.WSGW_mqtt_port : store.get('95598_mqtt_port')) || '',
-    mqtt_username =  (isNode() ? process.env.WSGW_mqtt_username : store.get('95598_mqtt_username')) || '',
-    mqtt_password =  (isNode() ? process.env.WSGW_mqtt_password : store.get('95598_mqtt_password')) || '';
+    mqtt_username = (isNode() ? process.env.WSGW_mqtt_username : store.get('95598_mqtt_username')) || '',
+    mqtt_password = (isNode() ? process.env.WSGW_mqtt_password : store.get('95598_mqtt_password')) || '';
 
   const mqtt = require('mqtt')
   const clientId = 'mqtt_qldocker'
@@ -1659,20 +1659,26 @@ async function sendMsg(e, eleBill, dayList, monthElecQuantity) {
     val.day = formatDate(val.day)
     return val
   })
-  let monthList = monthElecQuantity.mothEleList.map(val => {
-    val.month = formatDate(val.month)
-    return val
-  })
+  let monthList = []
+  if (monthElecQuantity.mothEleList) {
+    monthList = monthElecQuantity.mothEleList.map(val => {
+      val.month = formatDate(val.month)
+      return val
+    })
+  }
+
   data.dayList = dayList;
   data.monthList = monthList;
-  data.totalEleNum = monthElecQuantity.dataInfo.totalEleNum;
-  data.totalEleCost = monthElecQuantity.dataInfo.totalEleCost;
+  data.totalEleNum = monthElecQuantity?.dataInfo?.totalEleNum || '';
+  data.totalEleCost = monthElecQuantity?.dataInfo?.totalEleCost || '';
   client.on('connect', () => {
     console.log('Connected')
     //   console.log(data)
     client.publish(topic, JSON.stringify(data), { qos: 0, retain: false }, (error) => {
       if (error) {
         console.error(error)
+      }else {
+        console.log('Published')
       }
     })
   })
@@ -1735,6 +1741,7 @@ async function sendMsg(e, eleBill, dayList, monthElecQuantity) {
     eleBill.totalPq && (a += `本期电量: ${eleBill.totalPq}度`),
       eleBill.sumMoney && (a += `  账户余额: ${c}元`),
       (a += `\n截至日期: ${eleBill.date}`),
+      r &&
       r.totalEleNum &&
       r.totalEleCost &&
       (a += `\n年度用电: ${r.totalEleNum}度  累计花费: ${r.totalEleCost}元`),
