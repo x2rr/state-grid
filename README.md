@@ -1,6 +1,8 @@
 # state-grid
 国家电网青龙脚本，配合mqtt，在homeassistant中统计  
 
+2025年3月27日更新，国网网页维护已结束，脚本已可正常使用
+
 <img width="1057" alt="image" src="https://github.com/user-attachments/assets/b8e3986a-718f-4adb-ab2c-e199c7e6f114" />
 
 ## 青龙设置  
