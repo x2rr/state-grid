@@ -1,5 +1,5 @@
 # state-grid
-国家电网青龙脚本，配合mqtt，在homeassistant中统计  
+国家电网用电信息青龙脚本，配合mqtt，在homeassistant中统计  
 
 ----
 
