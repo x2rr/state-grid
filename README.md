@@ -1,9 +1,9 @@
 # state-grid
-国家电网用电信息青龙脚本，配合mqtt，在homeassistant中统计  
+单电表版国家电网用电信息青龙脚本，配合mqtt，在homeassistant中统计  
 
 ----
 
-2025年3月27日更新，国网网页维护已结束，脚本已可正常使用
+新增多电表版，详情请点击👉[查看详情](./README-multiple.md)
 
 ----
 
