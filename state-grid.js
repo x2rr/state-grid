@@ -1683,7 +1683,7 @@ async function sendMsg(e, eleBill, dayList, monthElecQuantity) {
   client.on('connect', () => {
     console.log('mqtt:Connected')
     //   console.log(data)
-    client.publish(topic, JSON.stringify(data), { qos: 0, retain: false }, (error) => {
+    client.publish(topic, JSON.stringify(data), { qos: 0, retain: true }, (error) => {
       if (error) {
         console.error(error)
       } else {
