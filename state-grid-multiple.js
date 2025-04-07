@@ -1725,12 +1725,7 @@ async function sendMsg(e, eleBill, dayList, monthElecQuantity) {
     (bizrt?.token && bizrt?.userInfo) || (await doLogin()),
     await getAuthcode(),
     await getAccessToken(),
-    await getBindInfo(),
-    isTrue(NOTIFY_TYPE) ||
-    (bindInfo.powerUserList.length > 1 &&
-      (bindInfo.powerUserList = bindInfo.powerUserList.filter(
-        e => '01' === e.elecTypeCode
-      )));
+    await getBindInfo();
   for (let e = 0; e < bindInfo.powerUserList.length; e++) {
     await getElcFee(e),
       await getDayElecQuantity(e),
